@@ -1,0 +1,24 @@
+{
+  "name": "boxunphp/php-redis",
+  "description": "PHP Redis Client",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Jordy",
+      "email": "arno.zheng@gmail.com"
+    }
+  ],
+  "require-dev": {
+    "phpunit/phpunit": "7.*"
+  },
+  "require": {
+    "boxunsoft/php-instance": "^v1.1.0",
+    "boxunphp/php-exception": "^v1.0.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "All\\Redis\\": ""
+    }
+  }
+}
