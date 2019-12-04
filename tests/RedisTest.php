@@ -77,20 +77,99 @@ class RedisTest extends TestCase
         $this->assertTrue($this->redis->pttl($k2) > 0 && $this->redis->pttl($k2) <= 3600);
     }
 
-//    public function testHashes()
-//    {
-//
-//    }
-//
-//    public function testLists()
-//    {
-//
-//    }
-//
-//    public function testSets()
-//    {
-//
-//    }
+    public function testHashes()
+    {
+        $key = 'hash';
+        $h1 = 'a';
+        $h2 = 'b';
+        $h3 = 'c';
+
+        $this->redis->del($key);
+        $this->assertEquals($this->redis->hSet($key, $h1, 1), 1);
+        $this->assertEquals($this->redis->hDel($key, $h1), 1);
+        $this->assertTrue($this->redis->hMSet($key, [$h1 => 1, $h2 => 2]));
+        $this->assertEquals($this->redis->hGet($key, $h1), 1);
+        $this->assertEquals($this->redis->hGet($key, $h2), 2);
+        $this->assertEquals($this->redis->hIncrBy($key, $h1, 3), 4);
+        $this->assertEquals($this->redis->hIncrBy($key, $h1, -2), 2);
+        $this->assertEquals($this->redis->hIncrBy($key, $h1, -3), -1);
+        $this->assertEquals($this->redis->hIncrByFloat($key, $h2, -3.3), -1.3);
+        $this->assertTrue($this->redis->hExists($key, $h1));
+        $this->assertTrue($this->redis->hExists($key, $h2));
+        $this->assertEquals($this->redis->hLen($key), 2);
+        $this->assertEquals($this->redis->hKeys($key), [$h1, $h2]);
+        $this->assertEquals($this->redis->hVals($key), [-1, -1.3]);
+        $this->assertEquals($this->redis->hGetAll($key), [$h1 => -1, $h2 => -1.3]);
+        $this->assertEquals($this->redis->hGetAll($key), $this->redis->hMGet($key, [$h1, $h2]));
+        $this->assertFalse($this->redis->hSetNx($key, $h1, 1));
+        $this->assertTrue($this->redis->hSetNx($key, $h3, 3));
+    }
+
+    public function testLists()
+    {
+        $key = 'list';
+        $key2 = '$list2';
+        $v1 = 1;
+        $v2 = 2;
+        $v3 = 3;
+        $v4 = 4;
+        $v5 = 5;
+        $v6 = 6;
+
+        $this->redis->del($key);
+        $this->redis->del($key2);
+        $this->assertEquals($this->redis->lPush($key, $v1), 1);
+        $this->assertEquals($this->redis->lPush($key, $v2), 2);
+        $this->assertEquals($this->redis->lPush($key, $v3), 3);
+        $this->assertEquals($this->redis->rPop($key), $v1);
+        $this->assertEquals($this->redis->rPop($key), $v2);
+        $this->assertEquals($this->redis->rPop($key), $v3);
+        $this->assertEquals($this->redis->rPush($key, $v1), 1);
+        $this->assertEquals($this->redis->rPush($key, $v2), 2);
+        $this->assertEquals($this->redis->rPush($key, $v3), 3);
+        $this->assertEquals($this->redis->lPop($key), $v1);
+        $this->assertEquals($this->redis->lPop($key), $v2);
+        $this->assertEquals($this->redis->lPop($key), $v3);
+
+
+        $this->assertEquals($this->redis->rPush($key, $v1), 1);
+        $this->assertEquals($this->redis->rPush($key, $v2), 2);
+        $this->assertEquals($this->redis->rPush($key, $v3), 3);
+
+        $this->assertEquals($this->redis->lGet($key, 0), $v1);
+        $this->assertEquals($this->redis->lGet($key, 1), $v2);
+        $this->assertEquals($this->redis->lGet($key, 2), $v3);
+        $this->assertFalse($this->redis->lGet($key, 10));
+        $this->assertEquals($this->redis->lIndex($key, 0), $v1);
+        $this->assertEquals($this->redis->lIndex($key, 1), $v2);
+        $this->assertEquals($this->redis->lIndex($key, 2), $v3);
+        $this->assertFalse($this->redis->lIndex($key, 10));
+
+        $this->assertEquals($this->redis->lRange($key, 1, 2), [$v2, $v3]);
+        $this->assertEquals($this->redis->lLen($key), 3);
+        $this->redis->rPush($key, $v2);
+        $this->redis->rPush($key, $v2);
+        $this->redis->rPush($key, $v2);
+        $this->assertEquals($this->redis->lLen($key), 6);
+        $this->assertEquals($this->redis->lRem($key, $v2, 2), 2);
+        $this->assertEquals($this->redis->lLen($key), 4);
+        $this->assertEquals($this->redis->lRange($key, 0, 3), [$v1, $v3, $v2, $v2]);
+        $this->assertTrue($this->redis->lTrim($key, 1, 2));
+        $this->assertEquals($this->redis->lRange($key, 0, 1), [$v3, $v2]);
+
+
+        $this->redis->rPush($key2, $v4, $v5, $v6);
+        $this->assertEquals($this->redis->lRange($key2, 0, 2), [$v4, $v5, $v6]);
+
+        $this->assertEquals($this->redis->rPoplPush($key2, $key), $v6);
+        $this->assertEquals($this->redis->lRange($key, 0, -1), [$v6, $v3, $v2]);
+        $this->assertEquals($this->redis->lRange($key2, 0, -1), [$v4, $v5]);
+    }
+
+    public function testSets()
+    {
+
+    }
 //
 //    public function testSortedSets()
 //    {
