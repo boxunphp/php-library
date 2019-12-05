@@ -54,11 +54,13 @@ use All\Exception\RedisException;
  * @method string lPop($key)
  * @method int lPush($key, $value1, $value2 = null, $valueN = null)
  * @method array lRange($key, $start, $end)
+ * @method array lGetRange($key, $start, $end)
  * @method array lTrim($key, $start, $stop)
  * @method int lRem($key, $value, $count)
  * @method string rPop($key)
  * @method int rPush($key, $value1, $value2 = null, $valueN = null)
  * @method int lLen($key)
+ * @method int lSize($key)
  * @method array blPop(array | string $keys, $timeout)
  * @method array brPop(array | string $keys, $timeout)
  * @method string rPoplPush($srcKey, $dstKey)
@@ -66,23 +68,34 @@ use All\Exception\RedisException;
  * @method int sAdd($key, $value1, $value2 = null, $valueN = null)
  * @method int sCard($key)
  * @method int sSize($key)
+ * @method array sDiff(string $key1, $key2 = null, $keyN = null)
+ * @method array sInter(string $key1, $key2 = null, $keyN = null)
  * @method bool sIsMember($key, $value)
+ * @method bool sContains($key, $value)
  * @method array sMembers($key)
+ * @method array sGetMembers($key)
+ * @method bool sMove($srcKey, $dstKey, $member)
  * @method int sRem($key, $member1, $member2 = null, $memberN = null)
  * @method string sPop($key)
  * @method string sRandMember($key)
+ * @method array sUnion(string $key1, $key2 = null, $keyN = null)
  * @method array|boolean sScan($key, &$iterator, $pattern = null, $count = 0)
  * @method int zAdd($key, $score1, $value1, $score2 = null, $value2 = null, $scoreN = null, $valueN = null)
  * @method int zCard($key)
+ * @method int zSize($key)
+ * @method int zCount($key, $start, $end)
  * @method float zIncrBy($key, $value, $member)
  * @method array zRange($key, $start, $end, $withScores = false)
  * @method array zRevRange($key, $start, $end, $withScores = false)
  * @method array zRangeByScore($key, $start, $end, $options = [])
- * @method array zRevRangeByScore($key, $start, $end, $options = [])
+ * @method array zRevRangeByScore($key, $max, $min, $options = [])
+ * @method int zRank($key, $member)
+ * @method int zRevRank($key, $member)
  * @method int zRem($key, $member1, $member2 = null, $memberN = null)
+ * @method int zRemRangeByRank($key, $start, $end)
  * @method int zRemRangeByScore($key, $start, $end)
- * @method array|boolean zScan($key, &$iterator, $pattern = null, $count = 0)
  * @method float zScore($key, $member)
+ * @method array|boolean zScan($key, &$iterator, $pattern = null, $count = 0)
  * @method Redis multi($type = \Redis::MULTI)
  * @method mixed exec()
  * @method string getLastError()
@@ -101,44 +114,11 @@ class Redis
 
     //读写分离时,读操作的方法名列表,方法名全部用小写字母,便于后续判断
     private $methodsByReadOp = [
-        'get',
-        'exists',
-        'mget',
-        'hget',
-        'hlen',
-        'hkeys',
-        'hvals',
-        'hgetall',
-        'hexists',
-        'hmget',
-        'lindex',
-        'lget',
-        'llen',
-        'lsize',
-        'lrange',
-        'lgetrange',
-        'scard',
-        'ssize',
-        'sdiff',
-        'sinter',
-        'sismember',
-        'scontains',
-        'smembers',
-        'sgetmembers',
-        'srandmember',
-        'sunion',
-        'zcard',
-        'zsize',
-        'zcount',
-        'zrange',
-        'zrangebyscore',
-        'zrevrangebyscore',
-        'zrangebylex',
-        'zrank',
-        'zrevrank',
-        'zrevrange',
-        'zscore',
-        'zunion'
+        'get', 'exists', 'mget', 'ttl', 'pttl',
+        'hget', 'hlen', 'hkeys', 'hvals', 'hgetall', 'hexists', 'hmget',
+        'lindex', 'lget', 'llen', 'lsize', 'lrange', 'lgetrange',
+        'scard', 'ssize', 'sdiff', 'sinter', 'sismember', 'scontains', 'smembers', 'sgetmembers', 'srandmember', 'sunion',
+        'zcard', 'zsize', 'zcount', 'zrange', 'zrangebyscore', 'zrevrangebyscore', 'zrangebylex', 'zrank', 'zrevrank', 'zrevrange', 'zscore', 'zunion'
     ];
 
     const MULTI = \Redis::MULTI;
