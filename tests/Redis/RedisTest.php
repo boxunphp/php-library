@@ -6,7 +6,7 @@
  * Time: 4:15 PM
  */
 
-namespace RedisTest;
+namespace Tests\Redis;
 
 use All\Redis\Redis;
 use PHPUnit\Framework\TestCase;
@@ -19,8 +19,8 @@ class RedisTest extends TestCase
     public function setUp()
     {
         $this->redis = Redis::getInstance([
-            'host' => $GLOBALS['REDIS_HOST'],
-            'port' => $GLOBALS['REDIS_PORT'],
+            'host' => 'redis-6379',
+            'port' => 6379,
             'timeout' => 1.0, //s
         ]);
     }
@@ -246,7 +246,8 @@ class RedisTest extends TestCase
         $v2 = 2;
         $this->redis->del($k1, $k2);
         $redis = $this->redis->multi();
-        $redis->set($k1, $v1)->set($k2, $v2);
+        $redis->set($k1, $v1);
+        $redis->set($k2, $v2);
         $this->assertEquals($redis->exec(), [0 => true, 1 => true]);
 
         $this->assertEquals($this->redis->get($k1), $v1);
