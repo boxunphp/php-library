@@ -3,23 +3,34 @@
 set -e
 set -x
 
-CURRENT_BRANCH="1.x"
+if [[ "$0" != "./bin/merge.sh" ]]
+then
+    echo "usage: bash ./bin/merge.sh as root path"
 
-#function split()
-#{
-#    SHA1=`./bin/splitsh-lite --prefix=$1`
-#    git push $2 "$SHA1:refs/heads/$CURRENT_BRANCH" -f
-#}
+    exit 1
+fi
 
-function remote()
-{
-    git remote add $1 "git@github.com:boxunphp/$1.git" || true
-}
+CURRENT_DIR=`pwd`
+TMP_DIR="/tmp/boxunphp-library"
+SRC_DIR="${CURRENT_DIR}/src"
+TESTS_DIR="${CURRENT_DIR}/tests"
 
-git pull origin $CURRENT_BRANCH
+git pull origin master
+git checkout master;
 
-for REMOTE in Request Response Router Config View Exception Logger Utils Session Error Redis Memcached Cache Mysql Model
+for REMOTE in Request Response Router Config View Exception Logger Utils Session Redis Memcached Cache Mysql Model
 do
-    remote $REMOTE
-#    git remote rm $REMOTE
+    echo ""
+    echo ""
+    echo "merging $REMOTE";
+
+    rm -rf "$SRC_DIR/$REMOTE";
+    cp -r "$TMP_DIR/$REMOTE/src" "$SRC_DIR/$REMOTE";
+
+    rm -rf "$TESTS_DIR/$REMOTE";
+    if [[ -d "$TMP_DIR/$REMOTE/tests/$REMOTE" ]]; then
+
+        cp -r "$TMP_DIR/$REMOTE/tests/$REMOTE" "$TESTS_DIR/$REMOTE";
+    fi
+
 done
