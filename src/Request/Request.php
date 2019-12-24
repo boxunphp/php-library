@@ -13,6 +13,7 @@ use All\Request\Request\Cookie;
 use All\Request\Request\File;
 use All\Request\Request\Header;
 use All\Request\Request\Session;
+use All\Router\Router;
 
 /**
  * 请求类
@@ -135,7 +136,7 @@ class Request
             $cliParams = $this->_cliParams();
             $this->params = $cliParams['params'];
         } else {
-            $this->params = [];
+            $this->params = Router::getInstance()->getParams();
         }
         return $this->params;
     }
