@@ -8,8 +8,8 @@
 
 namespace All\Redis;
 
-use Ali\InstanceTrait;
 use All\Exception\RedisException;
+use All\Instance\InstanceTrait;
 
 /**
  * https://github.com/phpredis/phpredis/tree/2.2.8

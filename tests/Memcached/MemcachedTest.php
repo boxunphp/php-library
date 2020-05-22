@@ -18,7 +18,7 @@ class MemcachedTest extends TestCase
      */
     private $mc;
 
-    public function setUp()
+    public function setUp(): void
     {
         $config = [
             'servers' => [

@@ -8,8 +8,8 @@
 
 namespace All\Memcached;
 
-use Ali\InstanceTrait;
 use All\Exception\MemcacheException;
+use All\Instance\InstanceTrait;
 
 /**
  * Class Memcached

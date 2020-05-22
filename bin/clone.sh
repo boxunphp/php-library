@@ -13,7 +13,7 @@ TMP_DIR="/tmp/boxunphp-library"
 rm -rf $TMP_DIR;
 mkdir $TMP_DIR;
 
-for REMOTE in Request Response Router Config View Exception Logger Utils Session Redis Memcached Cache Mysql Model
+for REMOTE in Instance Request Response Router Config View Exception Logger Utils Session Redis Memcached Cache Mysql Model
 do
     echo ""
     echo ""
@@ -26,8 +26,5 @@ do
 
     cd $REMOTE;
     git checkout master;
-
-#        git tag $VERSION
-#        git push origin --tags
 
 done

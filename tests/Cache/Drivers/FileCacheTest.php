@@ -18,7 +18,7 @@ class FileCacheTest extends TestCase
      */
     protected $cache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $config = [
             'path' => '/tmp',

@@ -8,7 +8,7 @@
 
 namespace All\Logger;
 
-use Ali\InstanceTrait;
+use All\Instance\InstanceTrait;
 use All\Request\Request;
 
 /**
@@ -88,8 +88,10 @@ class Logger
         if (is_string($data)) {
             $message = str_replace(["\r", "\n"], ' ', $data);
         } else {
-            $message = json_encode($data,
-                JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR);
+            $message = json_encode(
+                $data,
+                JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR
+            );
         }
 
         switch (self::$saveHandler) {
@@ -104,12 +106,13 @@ class Logger
                     'message' => $message
                 ];
 
-                $content = json_encode($log,
-                        JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR) . "\n";
+                $content = json_encode(
+                    $log,
+                    JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR
+                ) . "\n";
                 if ('php://stdout' == self::$savePath) {
                     $fp = defined('STDOUT') ? STDOUT : fopen('php://stdout', 'wb');
                     $result = $this->fwrite($fp, $content) !== false;
-
                 } else {
                     $fp = fopen(self::$savePath, 'wb');
                     $result = $this->fwrite($fp, $content) !== false;
@@ -213,5 +216,4 @@ class Logger
         }
         return $bytes;
     }
-
 }

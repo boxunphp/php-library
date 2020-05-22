@@ -15,22 +15,26 @@ use PHPUnit\Framework\TestCase;
 class ExceptionTest extends TestCase
 {
     /**
-     * @expectedException  \All\Exception\NotFoundException
-     * @expectedExceptionCode 404
-     * @expectedExceptionMessage Not Found
+     * @expectException  \All\Exception\NotFoundException
+     * @expectExceptionCode 404
+     * @expectExceptionMessage Not Found
      */
     public function testNotFound()
     {
+        $this->expectExceptionCode(404);
+        $this->expectExceptionMessage('Not Found');
         throw new NotFoundException();
     }
 
     /**
-     * @expectedException \All\Exception\BadRequestException
-     * @expectedExceptionCode 400
-     * @expectedExceptionMessage Bad Request
+     * @expectException \All\Exception\BadRequestException
+     * @expectExceptionCode 400
+     * @expectExceptionMessage Bad Request
      */
     public function testBadRequest()
     {
+        $this->expectExceptionCode(400);
+        $this->expectExceptionMessage('Bad Request');
         throw new BadRequestException();
     }
 }

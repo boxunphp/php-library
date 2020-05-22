@@ -18,7 +18,7 @@ class MemcachedCacheTest extends TestCase
      */
     protected $cache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $config = [
             'servers' => [

@@ -8,7 +8,7 @@
 
 namespace All\Session;
 
-use Ali\InstanceTrait;
+use All\Instance\InstanceTrait;
 
 class Session
 {

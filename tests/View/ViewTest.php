@@ -18,7 +18,7 @@ class ViewTest extends TestCase
      */
     protected $view;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->view = View::getInstance();
         $this->view->setRootPath(__DIR__ . '/views');

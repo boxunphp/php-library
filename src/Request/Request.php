@@ -8,7 +8,7 @@
 
 namespace All\Request;
 
-use Ali\InstanceTrait;
+use All\Instance\InstanceTrait;
 use All\Request\Request\Cookie;
 use All\Request\Request\File;
 use All\Request\Request\Header;
@@ -284,8 +284,10 @@ class Request
         //IP V4
         $ip = '';
         $unknown = 'unknown';
-        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR']) && strcasecmp($_SERVER['HTTP_X_FORWARDED_FOR'],
-                $unknown)) {
+        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR']) && strcasecmp(
+            $_SERVER['HTTP_X_FORWARDED_FOR'],
+            $unknown
+        )) {
             $ipList = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
             $clientIp = trim(current($ipList));
             if (ip2long($clientIp) !== false) {

@@ -8,8 +8,8 @@
 
 namespace All\Cache\Drivers;
 
-use Ali\InstanceTrait;
 use All\Cache\CacheInterface;
+use All\Instance\InstanceTrait;
 use All\Memcached\Memcached;
 
 class MemcachedCache implements CacheInterface

@@ -18,7 +18,7 @@ class RedisCacheTest extends TestCase
      */
     protected $cache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $config = [
             'master' => [

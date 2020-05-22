@@ -8,7 +8,7 @@
 
 namespace All\Utils;
 
-use Ali\InstanceTrait;
+use All\Instance\InstanceTrait;
 
 class Http
 {
@@ -217,8 +217,10 @@ class Http
         curl_close($ch);
 
         if (self::$callback) {
-            call_user_func_array(self::$callback,
-                [$this->url, $this->data, $this->getCurlInfo(), $this->getErrorCode(), $this->getErrorMessage()]);
+            call_user_func_array(
+                self::$callback,
+                [$this->url, $this->data, $this->getCurlInfo(), $this->getErrorCode(), $this->getErrorMessage()]
+            );
         }
 
         $this->reset();

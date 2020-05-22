@@ -8,7 +8,7 @@
 
 namespace All\Router;
 
-use Ali\InstanceTrait;
+use All\Instance\InstanceTrait;
 
 class Router
 {
@@ -22,7 +22,7 @@ class Router
     public function route($uri)
     {
         $this->reset();
-        $uri = trim($uri, '/');
+        $uri = trim(strtolower($uri), '/');
         if (!$uri) {
             return;
         }
@@ -95,8 +95,11 @@ class Router
         $this->config = [];
         foreach ($config as $key => $item) {
             foreach ($item as $k => $v) {
-                $v['pattern'] = str_replace(['(:string)', '(:int)', '(:any)'],
-                    ['([a-z_]+)', '([0-9]+)', '([a-z0-9_]+)'], $v['pattern']);
+                $v['pattern'] = str_replace(
+                    ['(:string)', '(:int)', '(:any)'],
+                    ['([a-z_]+)', '([0-9]+)', '([a-z0-9_]+)'],
+                    $v['pattern']
+                );
                 $this->config[$key][$k] = $v;
             }
         }

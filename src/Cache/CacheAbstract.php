@@ -8,12 +8,12 @@
 
 namespace All\Cache;
 
-use Ali\InstanceTrait;
 use All\Cache\Drivers\ApcuCache;
 use All\Cache\Drivers\FileCache;
 use All\Cache\Drivers\MemcachedCache;
 use All\Cache\Drivers\RedisCache;
 use All\Exception\ErrorException;
+use All\Instance\InstanceTrait;
 
 abstract class CacheAbstract
 {

@@ -8,8 +8,8 @@
 
 namespace All\Config;
 
-use Ali\InstanceTrait;
 use All\Exception\WarnException;
+use All\Instance\InstanceTrait;
 
 class Config
 {

@@ -18,7 +18,7 @@ class ApcuCacheTest extends TestCase
      */
     protected $cache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cache = ApcuCache::getInstance([]);
     }

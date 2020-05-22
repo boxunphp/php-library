@@ -18,7 +18,7 @@ TESTS_DIR="${CURRENT_DIR}/tests"
 git pull origin master
 git checkout master;
 
-for REMOTE in Request Response Router Config View Exception Logger Utils Session Redis Memcached Cache Mysql Model
+for REMOTE in Instance Request Response Router Config View Exception Logger Utils Session Redis Memcached Cache Mysql Model
 do
     echo ""
     echo ""

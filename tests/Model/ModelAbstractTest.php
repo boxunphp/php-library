@@ -10,7 +10,6 @@ namespace Tests\Model;
 
 use All\Cache\Cache;
 use All\Cache\CacheAbstract;
-use All\Cache\CacheInterface;
 use All\Model\ModelAbstract;
 use PHPUnit\Framework\TestCase;
 

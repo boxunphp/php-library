@@ -8,8 +8,8 @@
 
 namespace All\View;
 
-use Ali\InstanceTrait;
 use All\Exception\ServerErrorException;
+use All\Instance\InstanceTrait;
 use All\Router\Router;
 use All\Utils\HttpCode;
 

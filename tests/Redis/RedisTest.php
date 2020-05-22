@@ -16,7 +16,7 @@ class RedisTest extends TestCase
     /** @var  Redis */
     private $redis;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->redis = Redis::getInstance([
             'host' => 'redis-6379',
@@ -220,11 +220,15 @@ class RedisTest extends TestCase
         $this->assertEquals($this->redis->zRevRange($key, 2, 4), [$v4, $v3, $v2]);
         $this->assertEquals($this->redis->zRevRange($key, 2, 4, true), [$v4 => $s4, $v3 => $s3, $v2 => $s2]);
         $this->assertEquals($this->redis->zRangeByScore($key, 2, 4), [$v2, $v3, $v4]);
-        $this->assertEquals($this->redis->zRangeByScore($key, 2, 4, ['withscores' => true]),
-            [$v2 => $s2, $v3 => $s3, $v4 => $s4]);
+        $this->assertEquals(
+            $this->redis->zRangeByScore($key, 2, 4, ['withscores' => true]),
+            [$v2 => $s2, $v3 => $s3, $v4 => $s4]
+        );
         $this->assertEquals($this->redis->zRevRangeByScore($key, 4, 2), [$v4, $v3, $v2]);
-        $this->assertEquals($this->redis->zRevRangeByScore($key, 4, 2, ['withscores' => true]),
-            [$v4 => $s4, $v3 => $s3, $v2 => $s2]);
+        $this->assertEquals(
+            $this->redis->zRevRangeByScore($key, 4, 2, ['withscores' => true]),
+            [$v4 => $s4, $v3 => $s3, $v2 => $s2]
+        );
 
         $this->assertEquals($this->redis->zRank($key, $v3), 2);
         $this->assertEquals($this->redis->zRevRank($key, $v3), 3);
@@ -253,5 +257,4 @@ class RedisTest extends TestCase
         $this->assertEquals($this->redis->get($k1), $v1);
         $this->assertEquals($this->redis->get($k2), $v2);
     }
-
 }

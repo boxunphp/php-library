@@ -8,7 +8,7 @@
 
 namespace All\Response;
 
-use Ali\InstanceTrait;
+use All\Instance\InstanceTrait;
 use All\Utils\HttpCode;
 
 class Response

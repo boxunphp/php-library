@@ -8,9 +8,9 @@
 
 namespace All\Model;
 
-use Ali\InstanceTrait;
 use All\Cache\CacheAbstract;
 use All\Exception\ErrorException;
+use All\Instance\InstanceTrait;
 use All\Mysql\Mysql;
 
 class ModelAbstract
@@ -322,6 +322,5 @@ class ModelAbstract
 
     protected function filter(array $filter)
     {
-
     }
 }

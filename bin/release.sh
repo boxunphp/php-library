@@ -29,7 +29,7 @@ fi
 CURRENT_DIR=`pwd`
 TMP_DIR="/tmp/boxunphp-library"
 
-for REMOTE in Request Response Router Config View Exception Logger Utils Session Redis Memcached Cache Mysql Model
+for REMOTE in Instance Request Response Router Config View Exception Logger Utils Session Redis Memcached Cache Mysql Model
 do
     echo ""
     echo ""

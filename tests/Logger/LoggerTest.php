@@ -20,7 +20,7 @@ class LoggerTest extends TestCase
     protected $serverIp;
     protected $clientIp;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         Logger::setSavePath('/tmp');
         Logger::setLevel(Logger::E_DEBUG);
@@ -74,8 +74,10 @@ class LoggerTest extends TestCase
         if (is_string($data)) {
             $message = str_replace(["\r", "\n"], ' ', $data);
         } else {
-            $message = json_encode($data,
-                JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR);
+            $message = json_encode(
+                $data,
+                JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR
+            );
         }
         return $message;
     }
