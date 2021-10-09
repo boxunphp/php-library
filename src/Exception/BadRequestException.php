@@ -8,10 +8,8 @@
 
 namespace All\Exception;
 
-use All\Utils\HttpCode;
-
 class BadRequestException extends Exception
 {
-    protected $code = HttpCode::BAD_REQUEST;
+    protected $code = 400;
     protected $message = 'Bad Request';
 }

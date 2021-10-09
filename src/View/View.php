@@ -10,8 +10,7 @@ namespace All\View;
 
 use All\Exception\ServerErrorException;
 use All\Instance\InstanceTrait;
-use All\Router\Router;
-use All\Utils\HttpCode;
+use InvalidArgumentException;
 
 class View
 {
@@ -49,7 +48,7 @@ class View
      * @param string $tpl
      * @throws ServerErrorException
      */
-    public function render($tpl = '')
+    public function render($tpl)
     {
         echo $this->fetch($tpl);
     }
@@ -61,14 +60,14 @@ class View
      * @return string
      * @throws ServerErrorException
      */
-    public function fetch($tpl = '')
+    public function fetch($tpl)
     {
         if (!$tpl) {
-            $tpl = $this->_getDefaultTpl();
+            throw new InvalidArgumentException('Invalid template parameter');
         }
         $tplFile = $this->_getTplFile($tpl);
         if (!file_exists($tplFile)) {
-            throw new ServerErrorException('The template file ' . $tplFile . ' is not exists', HttpCode::NOT_FOUND);
+            throw new ServerErrorException('The template file ' . $tplFile . ' is not exists', 404);
         }
 
         $this->data && extract($this->data);
@@ -107,14 +106,5 @@ class View
         $path = $this->getRootPath();
         $tpl = trim($tpl, '/\\');
         return $path . DIRECTORY_SEPARATOR . $tpl . $this->extensionName;
-    }
-
-    /**
-     * @return string
-     * @throws \Exception
-     */
-    protected function _getDefaultTpl()
-    {
-        return Router::getInstance()->getPath();
     }
 }

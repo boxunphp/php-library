@@ -8,10 +8,8 @@
 
 namespace All\Exception;
 
-use All\Utils\HttpCode;
-
 class MethodNotAllowedException extends Exception
 {
-    protected $code = HttpCode::METHOD_NOT_ALLOWED;
+    protected $code = 405;
     protected $message = 'Method Not Allowed';
 }

@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Jordy
- * Date: 2019/12/6
- * Time: 3:46 PM
- */
-
 namespace All\Session;
 
 use All\Instance\InstanceTrait;
@@ -14,6 +7,20 @@ class Session
 {
     use InstanceTrait;
 
+    /**
+     * 启动Session
+     *
+     * https://www.php.net/manual/zh/session.configuration.php
+     * @param array $config
+        [
+            'save_handler' => 'redis',
+            'save_path' => 'tcp://127.0.0.1:6379?auth=&weight=100&timeout=1&persistent=1&database=0', // database:选择那个Redis数据库;timeout:连接超时时间;weight:权重;persistent:长连接;auth:Redis密码
+            'name' => 'TESTSESS', // 会话名,用作 cookie 的名字
+            'gc_maxlifetime' => 1440,
+            
+        ]
+     * @return self
+     */
     public function start($config = [])
     {
         $saveHandler = isset($config['save_handler']) ? $config['save_handler'] : 'files';

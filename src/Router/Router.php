@@ -1,169 +1,74 @@
 <?php
+
 /**
- * Created by PhpStorm.
- * User: Jordy
- * Date: 2019/12/12
- * Time: 10:48 AM
+ * This file is part of the Boxunsoft package.
+ *
+ * (c) Jordy <arno.zheng@gmail.com>
+ * 
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code
  */
 
 namespace All\Router;
 
-use All\Instance\InstanceTrait;
+use All\Router\Interfaces\DispatcherInterface;
+use All\Router\Interfaces\CollectorInterface;
 
 class Router
 {
-    use InstanceTrait;
-
     protected $config = [];
-    protected $controller = 'Index';
-    protected $path = 'Index';
-    protected $params = [];
-
-    public function route($uri)
-    {
-        $this->reset();
-        $uri = trim(strtolower($uri), '/');
-        if (!$uri) {
-            return;
-        }
-
-        $this->routePattern($uri);
-    }
 
     /**
-     * @param $config
-     * @example
-     * [
-     *      '/a/b/:id' => '/a/b'
-     * ]
-     * @return $this
+     * @var DispatcherInterface
      */
-    public function init($config)
-    {
-        if (!$config) {
-            return $this;
-        }
-        foreach ($config as $pattern => $uri) {
-            if (!is_string($pattern) || !is_string($uri)) {
-                continue;
-            }
-            $pattern = trim($pattern, '/');
-            // 配置信息要规范, 这个自行控制
-            $arr = explode('/', $pattern);
-            // 第一节不能带通配符, 这个配置自行控制
-            $key = $arr[0];
-            if (!isset($this->config[$key])) {
-                $this->config[$key] = [];
-            }
-
-            // 换成通配符, 提取key
-            $newArr = [];
-            $keys = [];
-            foreach ($arr as $name) {
-                if ($name[0] == ':') {
-                    $newArr[] = '([a-z0-9_]+)';
-                    $keys[] = substr($name, 1);
-                } else {
-                    $newArr[] = $name;
-                }
-            }
-
-            $this->config[$key][] = [
-                'pattern' => '/' . implode('/', $newArr),
-                'keys' => $keys,
-                'uri' => $uri,
-            ];
-        }
-
-        return $this;
-    }
+    protected $dispatcher;
 
     /**
      * @param array $config
-     * @example
-     * [
-     *      'a' => [
-     *          ['pattern' => '/a/b/(:int)', 'keys'=>['id'], 'uri'=> '/a/b'],
-     *          ['pattern' => '/a/c/(:string)', 'keys'=>['name'], 'uri'=> '/a/c'],
-     *          ['pattern' => '/a/d/(:any)', 'keys'=>['product'], 'uri'=> '/a/d'],
-     *      ]
-     * ]
-     * @return $this
+     * 
+     * @example $config 
+     * $config = [
+     *   ['method' => 'GET', 'route' => '/aaa[/{id:number}/{age}/ggg[/bbb[/ccc[/ddd]]]]', 'handler' => 'handlerA'],
+     *   ['group' => '/bbb', 'routes' => [
+     *       ['method' => 'GET', 'route' => '/uuu[/{id:number}/{age}/ggg[/bbb[/ccc[/ddd]]]]', 'handler' => 'handlerBU'],
+     *       ['method' => 'GET', 'route' => '/iii[/{id:number}/{age}/ggg[/bbb[/ccc[/ddd]]]]', 'handler' => 'handlerBI'],
+     *       ['method' => 'GET', 'route' => '/ooo[/{id:number}/{age}/ggg[/bbb[/ccc[/ddd]]]]', 'handler' => 'handlerBO'],
+     *   ]],
+     *   ['method' => 'GET', 'route' => '/ccc[/{id:number}]', 'handler' => 'handlerC'],
+     * ];
      */
-    public function setConfig(array $config)
+    public function __construct(array $config = [])
     {
-        $this->config = [];
-        foreach ($config as $key => $item) {
-            foreach ($item as $k => $v) {
-                $v['pattern'] = str_replace(
-                    ['(:string)', '(:int)', '(:any)'],
-                    ['([a-z_]+)', '([0-9]+)', '([a-z0-9_]+)'],
-                    $v['pattern']
-                );
-                $this->config[$key][$k] = $v;
-            }
-        }
-
-        return $this;
+        $collector = $this->getCollector($config);
+        $this->dispatcher = new Dispatcher($collector->getData());
     }
 
-    public function getController()
+    public function dispatch($method, $requestUri)
     {
-        return $this->controller;
+        $strpos = strpos($requestUri, '?');
+        $pathInfo = $strpos !== false ? substr($requestUri, 0, $strpos) : $requestUri;
+        return $this->dispatcher->dispatch($method, $pathInfo);
     }
 
-    public function getPath()
+    protected function getCollector($config): CollectorInterface
     {
-        return $this->path;
-    }
+        $parser = new Parser();
+        $generator = new Generator;
+        $collector = new Collector($parser, $generator);
 
-    public function getParams()
-    {
-        return $this->params;
-    }
-
-    protected function routePattern($uri)
-    {
-        if (!$this->config) {
-            return $this->routeUri($uri);
-        }
-        $uriArr = explode('/', $uri);
-        $key = $uriArr['0'];
-        if (!isset($this->config[$key])) {
-            return $this->routeUri($uri);
-        }
-        $config = $this->config[$uriArr[0]];
         foreach ($config as $item) {
-            if (preg_match('#^' . trim($item['pattern'], '/') . '$#i', $uri, $match)) {
-                foreach ($item['keys'] as $idx => $key) {
-                    $this->params[$key] = $match[$idx + 1];
-                }
-                return $this->routeUri($item['uri']);
+            if (isset($item['group'], $item['routes'])) {
+                $routes = $item['routes'];
+                $collector->addGroup($item['group'], function (CollectorInterface $collector) use ($routes) {
+                    foreach ($routes as $route) {
+                        $collector->addRoute($route['method'], $route['route'], $route['handler']);
+                    }
+                });
+            } else {
+                $collector->addRoute($item['method'], $item['route'], $item['handler']);
             }
         }
-        return $this->routeUri($uri);
-    }
 
-    protected function routeUri($uri)
-    {
-        $uriArr = explode('/', $uri);
-        $controllerArr = [];
-        foreach ($uriArr as $uri) {
-            if (!$uri || strpos($uri, '.') !== false) {
-                continue;
-            }
-            $arr = array_filter(explode('_', $uri));
-            $controllerArr[] = implode('', array_map('ucfirst', $arr));
-        }
-        $this->controller = implode('\\', $controllerArr);
-        $this->path = implode('/', $controllerArr);
-        return true;
-    }
-
-    protected function reset()
-    {
-        $this->controller = 'Index';
-        $this->path = 'Index';
-        $this->params = [];
+        return $collector;
     }
 }

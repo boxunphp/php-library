@@ -9,9 +9,8 @@
       "email": "arno.zheng@gmail.com"
     }
   ],
-  "minimum-stability": "dev",
   "require-dev": {
-    "phpunit/phpunit": "8.*"
+    "phpunit/phpunit": "^8.0"
   },
   "require": {
     "php": "^7.2"

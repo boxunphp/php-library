@@ -1,426 +1,196 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Jordy
- * Date: 2019/12/6
- * Time: 1:48 PM
+ * This file is part of the Boxunsoft package.
+ *
+ * (c) Jordy <arno.zheng@gmail.com>
+ * 
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code
  */
 
 namespace All\Request;
 
 use All\Instance\InstanceTrait;
-use All\Request\Request\Cookie;
-use All\Request\Request\File;
-use All\Request\Request\Header;
-use All\Request\Request\Session;
-use All\Router\Router;
+use Symfony\Component\HttpFoundation\Request as HttpFoundationRequest;
 
 /**
  * 请求类
- *
- * Class Request
- * @package All
+ * 使用symfony/http-foundation
  */
 class Request
 {
     use InstanceTrait;
+    use BagTrait;
+    use MethodTrait;
 
-    private $serverScheme;
-    private $serverHost;
-    private $serverName;
-    private $serverPort;
-    private $serverIp;
+    protected $requestId;
+    protected $serverIp;
+    private $req;
 
-    private $uri;
-    private $requestUri;
-    private $suffix = null;
-    private $requestId;
-
-    private $method;
-    private $params = null;
-    private $cliParams = null;
-
-    private $clientIp;
-    private $clientPort;
-    private $userAgent;
-    private $referer;
-
-    private $cookie;
-    private $session;
-    private $header;
-    private $file;
+    public function __construct()
+    {
+        $this->req = HttpFoundationRequest::createFromGlobals();
+    }
 
     /**
-     * URL的原始路径
+     * 带queryString
+     *
+     * @return void
+     */
+    public function getRequestUri()
+    {
+        return $this->req->getRequestUri();
+    }
+
+    /**
+     * 整个URL
      *
      * @return string
      */
-    public function requestUri()
+    public function getUri()
     {
-        if ($this->requestUri) {
-            return $this->requestUri;
-        }
-        if ($this->isCli()) {
-            $cliParams = $this->_cliParams();
-            $this->requestUri = $cliParams['uri'];
-        } else {
-            $this->requestUri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '/';
-            $strpos = strpos($this->requestUri, '?');
-            if ($strpos !== false) {
-                $this->requestUri = substr($this->requestUri, 0, $strpos);
-            }
-        }
-        return $this->requestUri;
+        return $this->req->getUri();
     }
 
     /**
-     * 过滤后缀后的路径, 与相应应用的控制一致
+     * 不带queryString的path
      *
      * @return string
      */
-    public function uri()
+    public function getPathInfo()
     {
-        if ($this->uri) {
-            return $this->uri;
-        }
-        $requestUri = $this->requestUri();
-        $strpos = strpos($requestUri, '.');
-        if ($strpos === false) {
-            $this->uri = $requestUri;
-        } else {
-            $this->uri = substr($requestUri, 0, $strpos);
-        }
-        return $this->uri;
+        return $this->req->getPathInfo();
     }
 
     /**
-     * URL后缀, 扩展名(如index.php.json, 由认为.php.json,而不是.json)
+     * 请求ID
+     *
      * @return string
      */
-    public function suffix()
+    public function getRequestId()
     {
-        if ($this->suffix !== null) {
-            return $this->suffix;
-        }
-        $requestUri = $this->requestUri();
-        $this->suffix = strstr($requestUri, '.');
-        $this->suffix = $this->suffix === false ? '' : $this->suffix;
-        return $this->suffix;
-    }
-
-    public function requestId()
-    {
-        if (!$this->requestId) {
+        if (null === $this->requestId) {
             $this->requestId = md5(uniqid(gethostname(), true));
         }
         return $this->requestId;
     }
 
-    public function setParams($params)
-    {
-        $this->params = $params;
-        return $params;
-    }
-
     /**
-     * CLI模式下参数
-     * @return array|mixed
-     */
-    public function params()
-    {
-        if (!is_null($this->params)) {
-            return $this->params;
-        }
-
-        if ($this->isCli()) {
-            $cliParams = $this->_cliParams();
-            $this->params = $cliParams['params'];
-        } else {
-            $this->params = Router::getInstance()->getParams();
-        }
-        return $this->params;
-    }
-
-    public function param($key, $default = null)
-    {
-        $params = $this->params();
-        return isset($params[$key]) ? $params[$key] : $default;
-    }
-
-    /**
-     * 获取RAW的POST数据
+     * RAW请求内容
      *
-     * @return bool|string
+     * @return string
      */
-    public function input()
+    public function getBody()
     {
-        return file_get_contents('php://input');
-    }
-
-    public function get($key = '', $default = null)
-    {
-        if (!$key) {
-            return $_GET;
-        }
-        return isset($_GET[$key]) ? $_GET[$key] : $default;
-    }
-
-    public function post($key = '', $default = null)
-    {
-        if (!$key) {
-            return $_POST;
-        }
-        return isset($_POST[$key]) ? $_POST[$key] : $default;
+        return $this->req->getContent();
     }
 
     /**
-     * @return Cookie
+     * HTTP协议名
+     *
+     * @return string
      */
-    public function cookie()
+    public function getServerScheme()
     {
-        if ($this->cookie !== null) {
-            return $this->cookie;
-        }
-        return $this->cookie = new Cookie();
+        return $this->req->getScheme();
     }
 
     /**
-     * @return Session
+     * 服务器主机
+     *
+     * @return string
      */
-    public function session()
+    public function getServerHost()
     {
-        if ($this->session !== null) {
-            return $this->session;
-        }
-        return $this->session = new Session();
+        return $this->req->getHost();
     }
 
     /**
-     * @return Header
+     * 服务器名
+     *
+     * @return string
      */
-    public function header()
+    public function getServerName()
     {
-        if ($this->header !== null) {
-            return $this->header;
-        }
-        return $this->header = new Header();
+        return $this->server()->get('SERVER_NAME', '');
     }
 
     /**
-     * @return File
+     * 服务器端口
+     *
+     * @return void
      */
-    public function file()
+    public function getServerPort()
     {
-        if ($this->file !== null) {
-            return $this->file;
-        }
-        return $this->file = new File();
+        return $this->req->getPort();
     }
 
-    public function method()
+    /**
+     * 服务器IP
+     *
+     * @return string
+     */
+    public function getServerIp()
     {
-        if ($this->method) {
-            return $this->method;
-        }
-        $this->method = $this->isCli() ? 'CLI' : strtoupper($_SERVER['REQUEST_METHOD']);
-        return $this->method;
-    }
-
-    public function serverScheme()
-    {
-        if ($this->serverScheme) {
-            return $this->serverScheme;
-        }
-        $this->serverScheme = isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) ? 'https' : 'http';
-        return $this->serverScheme;
-    }
-
-    public function serverHost()
-    {
-        if ($this->serverHost) {
-            return $this->serverHost;
-        }
-        $this->serverHost = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
-        return $this->serverHost;
-    }
-
-    public function serverName()
-    {
-        if ($this->serverName) {
-            return $this->serverName;
-        }
-        $this->serverName = isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '';
-        return $this->serverName;
-    }
-
-    public function serverPort()
-    {
-        if ($this->serverPort) {
-            return $this->serverPort;
-        }
-        $this->serverPort = isset($_SERVER['SERVER_PORT']) ? $_SERVER['SERVER_PORT'] : '';
-        return $this->serverPort;
-    }
-
-    public function serverIp()
-    {
-        if ($this->serverIp) {
+        if (null !== $this->serverIp) {
             return $this->serverIp;
         }
-        //IP V4
-        if (!empty($_SERVER['SERVER_ADDR'])) {
-            $this->serverIp = $_SERVER['SERVER_ADDR'];
-        } else {
+
+        $this->serverIp = $this->server()->get('SERVER_ADDR');
+        if (!$this->serverIp) {
             $this->serverIp = gethostbyname(gethostname());
         }
+
         return $this->serverIp;
     }
 
-    public function clientIp()
+    /**
+     * 客户端IP
+     *
+     * @return string
+     */
+    public function getClientIp()
     {
-        if ($this->clientIp) {
-            return $this->clientIp;
-        }
-        //IP V4
-        $ip = '';
-        $unknown = 'unknown';
-        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR']) && strcasecmp(
-            $_SERVER['HTTP_X_FORWARDED_FOR'],
-            $unknown
-        )) {
-            $ipList = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
-            $clientIp = trim(current($ipList));
-            if (ip2long($clientIp) !== false) {
-                $ip = $clientIp;
-            }
-        }
-        if (!$ip && !empty($_SERVER['REMOTE_ADDR']) && strcasecmp($_SERVER['REMOTE_ADDR'], $unknown)) {
-            $ip = trim($_SERVER['REMOTE_ADDR']);
-        }
-        $this->clientIp = $ip;
-        return $this->clientIp;
+        return $this->req->getClientIp();
     }
 
-    public function clientPort()
+    /**
+     * 客户端端口
+     *
+     * @return string
+     */
+    public function getClientPort()
     {
-        if ($this->clientPort) {
-            return $this->clientPort;
-        }
-        $this->clientPort = isset($_SERVER['REMOTE_PORT']) ? $_SERVER['REMOTE_PORT'] : '';
-        return $this->clientPort;
+        return $this->server()->get('REMOTE_PORT', '');
     }
 
+    /**
+     * 客户端UA
+     *
+     * @return string
+     */
     public function userAgent()
     {
-        if ($this->userAgent) {
-            return $this->userAgent;
-        }
-        $this->userAgent = $this->header()->get('USER_AGENT', '');
-        return $this->userAgent;
+        return $this->header()->get('HTTP_USER_AGENT');
     }
 
+    /**
+     * 来源地址
+     *
+     * @return string
+     */
     public function referer()
     {
-        if ($this->referer) {
-            return $this->referer;
-        }
-        $this->referer = $this->header()->get('REFERER', '');
-        return $this->referer;
-    }
-
-    public function isCli()
-    {
-        return 'cli' == PHP_SAPI;
-    }
-
-    public function isPost()
-    {
-        return 'POST' == $this->method();
-    }
-
-    public function isGet()
-    {
-        return 'GET' == $this->method();
-    }
-
-    public function isPut()
-    {
-        return 'PUT' == $this->method();
-    }
-
-    public function isPatch()
-    {
-        return 'PATCH' == $this->method();
-    }
-
-    public function isDelete()
-    {
-        return 'DELETE' == $this->method();
-    }
-
-    public function isHead()
-    {
-        return 'HEAD' == $this->method();
-    }
-
-    public function isOptions()
-    {
-        return 'OPTIONS' == $this->method();
+        return $this->header()->get('HTTP_REFERER');
     }
 
     /**
      * 是否是Ajax请求
      *
-     * @return bool
+     * @return boolean
      */
     public function isXmlHttpRequest()
     {
-        if ('XMLHttpRequest' == $this->header()->get('X_REQUESTED_WITH')) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * CLI模式下的参数
-     *
-     * @example
-     *      php_command index.php --uri="lion/jump" --params="a=A&b=B" --post="c=C&d=D" --get="e=E&f=F"
-     *
-     * @return array|null
-     */
-    protected function _cliParams()
-    {
-        if ($this->cliParams !== null) {
-            return $this->cliParams;
-        }
-
-        $args = getopt('', array('uri:', 'params::', 'post::', 'get::'));
-        $args['uri'] = empty($args['uri']) ? '/' : $args['uri'];
-        //PARAMS
-        if (empty($args['params'])) {
-            $args['params'] = [];
-        } else {
-            parse_str($args['params'], $args['params']);
-        }
-        //POST
-        if (isset($args['post'])) {
-            if (empty($args['post'])) {
-                $_POST = [];
-            } else {
-                parse_str($args['post'], $_POST);
-            }
-        }
-        //GET
-        if (isset($args['get'])) {
-            if (empty($args['get'])) {
-                $_GET = [];
-            } else {
-                parse_str($args['get'], $_GET);
-            }
-        }
-        $this->cliParams = $args;
-        return $this->cliParams;
+        return $this->req->isXmlHttpRequest();
     }
 }

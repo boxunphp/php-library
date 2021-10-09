@@ -11,7 +11,7 @@ namespace All\Model;
 use All\Cache\CacheAbstract;
 use All\Exception\ErrorException;
 use All\Instance\InstanceTrait;
-use All\Mysql\Mysql;
+use All\Mysql\Drivers\Mysql;
 
 class ModelAbstract
 {
