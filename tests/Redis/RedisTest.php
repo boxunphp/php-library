@@ -136,10 +136,6 @@ class RedisTest extends TestCase
         $this->assertEquals($this->redis->rPush($key, $v2), 2);
         $this->assertEquals($this->redis->rPush($key, $v3), 3);
 
-        $this->assertEquals($this->redis->lGet($key, 0), $v1);
-        $this->assertEquals($this->redis->lGet($key, 1), $v2);
-        $this->assertEquals($this->redis->lGet($key, 2), $v3);
-        $this->assertFalse($this->redis->lGet($key, 10));
         $this->assertEquals($this->redis->lIndex($key, 0), $v1);
         $this->assertEquals($this->redis->lIndex($key, 1), $v2);
         $this->assertEquals($this->redis->lIndex($key, 2), $v3);
@@ -180,7 +176,6 @@ class RedisTest extends TestCase
         $this->assertEquals($this->redis->sAdd($key, $v2, $v3), 2);
         $this->assertEquals($this->redis->sAdd($key, $v2, $v3), 0);
         $this->assertEquals($this->redis->sCard($key), 3);
-        $this->assertEquals($this->redis->sSize($key), 3);
         $this->assertTrue($this->redis->sIsMember($key, $v1));
         $this->assertFalse($this->redis->sIsMember($key, $v4));
         $this->assertEquals($this->redis->sMembers($key), [$v1, $v2, $v3]);
@@ -212,7 +207,6 @@ class RedisTest extends TestCase
         $this->assertEquals($this->redis->zAdd($key, $s1, $v1), 1);
         $this->assertEquals($this->redis->zAdd($key, $s2, $v2, $s3, $v3), 2);
         $this->assertEquals($this->redis->zCard($key), 3);
-        $this->assertEquals($this->redis->zSize($key), 3);
         $this->assertEquals($this->redis->zAdd($key, $s5, $v5, $s4, $v4, $s6, $v6), 3);
         $this->assertEquals($this->redis->zCount($key, 2, 4), 3);
         $this->assertEquals($this->redis->zRange($key, 2, 4), [$v3, $v4, $v5]);

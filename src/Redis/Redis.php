@@ -50,7 +50,6 @@ use All\Instance\InstanceTrait;
  * @method array hMGet($key, $hashKeys)
  * @method array hScan($key, &$iterator, $pattern = null, $count = 0)
  * @method string lIndex($key, $index)
- * @method string lGet($key, $index)
  * @method string lPop($key)
  * @method int lPush($key, $value1, $value2 = null, $valueN = null)
  * @method array lRange($key, $start, $end)
@@ -67,7 +66,6 @@ use All\Instance\InstanceTrait;
  * @method string brPoplPush($srcKey, $dstKey, $timeout)
  * @method int sAdd($key, $value1, $value2 = null, $valueN = null)
  * @method int sCard($key)
- * @method int sSize($key)
  * @method array sDiff(string $key1, $key2 = null, $keyN = null)
  * @method array sInter(string $key1, $key2 = null, $keyN = null)
  * @method bool sIsMember($key, $value)
@@ -82,7 +80,6 @@ use All\Instance\InstanceTrait;
  * @method array|boolean sScan($key, &$iterator, $pattern = null, $count = 0)
  * @method int zAdd($key, $score1, $value1, $score2 = null, $value2 = null, $scoreN = null, $valueN = null)
  * @method int zCard($key)
- * @method int zSize($key)
  * @method int zCount($key, $start, $end)
  * @method float zIncrBy($key, $value, $member)
  * @method array zRange($key, $start, $end, $withScores = false)
@@ -116,9 +113,9 @@ class Redis
     private $methodsByReadOp = [
         'get', 'exists', 'mget', 'ttl', 'pttl',
         'hget', 'hlen', 'hkeys', 'hvals', 'hgetall', 'hexists', 'hmget',
-        'lindex', 'lget', 'llen', 'lsize', 'lrange', 'lgetrange',
-        'scard', 'ssize', 'sdiff', 'sinter', 'sismember', 'scontains', 'smembers', 'sgetmembers', 'srandmember', 'sunion',
-        'zcard', 'zsize', 'zcount', 'zrange', 'zrangebyscore', 'zrevrangebyscore', 'zrangebylex', 'zrank', 'zrevrank', 'zrevrange', 'zscore', 'zunion'
+        'lindex', 'llen', 'lsize', 'lrange', 'lgetrange',
+        'scard', 'sdiff', 'sinter', 'sismember', 'scontains', 'smembers', 'sgetmembers', 'srandmember', 'sunion',
+        'zcard', 'zcount', 'zrange', 'zrangebyscore', 'zrevrangebyscore', 'zrangebylex', 'zrank', 'zrevrank', 'zrevrange', 'zscore', 'zunion'
     ];
 
     const MULTI = \Redis::MULTI;

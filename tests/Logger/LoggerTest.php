@@ -12,6 +12,7 @@ class LoggerTest extends TestCase
     protected $host;
     protected $serverIp;
     protected $clientIp;
+    protected $fileSavePath = '/tmp';
 
     protected function setUp(): void
     {
@@ -24,7 +25,7 @@ class LoggerTest extends TestCase
     public function testFileHandler()
     {
         $handler = new FileHandler();
-        $handler->setSavePath('/tmp');
+        $handler->setSavePath($this->fileSavePath);
 
         $Logger = new Logger(LogLevel::DEBUG, $handler);
 
@@ -55,7 +56,7 @@ class LoggerTest extends TestCase
 
         foreach ($files as $file) {
             foreach ($list as $message) {
-                $filename = '/tmp/' . $file . '.log';
+                $filename = $this->fileSavePath . '/' . $file . '.log';
                 @unlink($filename);
                 $Logger->{$file}($message);
                 $log = $logTmpl;
